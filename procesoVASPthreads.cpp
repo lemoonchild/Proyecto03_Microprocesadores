@@ -28,6 +28,8 @@ struct ThreadArgs {
 
 void* efectivo(void* args);
 void distribucionAutos(int total_compass, int total_efectivo);
+void* compass(void* args);
+void distribucionAutos(int total_compass, int total_efectivo);
 
 int numAutosConCompass, numAutosEfectivo;
 
@@ -41,6 +43,7 @@ int main(int argc, char const *argv[]) {
     cin >> numAutosEfectivo;
     cout << "\nComenzando simulacion...\n";
     
+    distribucionAutos(numAutosConCompass, numAutosEfectivo);
     cout << "\nFinalizando simulacion...\n";
     
     return 0;
@@ -73,7 +76,12 @@ void distribucionAutos(int total_compass, int total_efectivo) {
 
     int autosPorKioscoEfectivo = total_efectivo / 3;
     int autosExtraEfectivo[] = {total_efectivo % 3 >= 1, total_efectivo % 3 == 2, 0};
-
+    
+    for (int i = 0; i < 3; i++) {
+        args[i] = {autosPorKioscoCompass, autosExtraCompass[i], i, &tiempoTotalCompass};
+        pthread_create(&threads[i], NULL, compass, (void*)&args[i]);
+    }
+    
     for (int i = 0; i < 3; i++) {
         args[i+3] = {autosPorKioscoEfectivo, autosExtraEfectivo[i], i}; //&tiempoTotalEfectivo};
         pthread_create(&threads[i+3], NULL, efectivo, (void*)&args[i+3]);
@@ -82,5 +90,6 @@ void distribucionAutos(int total_compass, int total_efectivo) {
     for (int i = 0; i < 6; i++) {
         pthread_join(threads[i], NULL);
     }
+
 }
 
