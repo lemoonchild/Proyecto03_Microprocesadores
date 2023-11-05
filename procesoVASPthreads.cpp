@@ -29,10 +29,11 @@ struct ThreadArgs {
 void* efectivo(void* args);
 void distribucionAutos(int total_compass, int total_efectivo);
 void* compass(void* args);
-void distribucionAutos(int total_compass, int total_efectivo);
+void estadisticas(double number, vector<double>& tiempoTotalCompass, vector<double>& tiempoTotalEfectivo);
 
 int numAutosConCompass, numAutosEfectivo;
-
+vector<double> tiempoTotalCompass(3, 0);
+vector<double> tiempoTotalEfectivo(3, 0);
 mutex mtx;
 
 int main(int argc, char const *argv[]) {
@@ -42,7 +43,15 @@ int main(int argc, char const *argv[]) {
     cout << "\nPor favor indica cuantos carros deseas pagar con efectivo: ";
     cin >> numAutosEfectivo;
     cout << "\nComenzando simulacion...\n";
-    
+
+	auto start_time = chrono::steady_clock::now();
+    distribucionAutos(numAutosConCompass, numAutosEfectivo);
+    auto end_time = chrono::steady_clock::now();
+
+    cout << "\nFinalizando simulacion...\n";
+    auto duration = chrono::duration_cast<chrono::seconds>(end_time - start_time).count();
+    estadisticas(duration, tiempoTotalCompass, tiempoTotalEfectivo);
+
     distribucionAutos(numAutosConCompass, numAutosEfectivo);
     cout << "\nFinalizando simulacion...\n";
     
@@ -92,4 +101,13 @@ void distribucionAutos(int total_compass, int total_efectivo) {
     }
 
 }
-
+void estadisticas(double number, vector<double>& tiempoTotalCompass, vector<double>& tiempoTotalEfectivo) {
+    cout << "\n--- Estadisticas de la simulacion ---\n";
+    for (int i = 0; i < 3; i++) {
+        cout << "Tiempo del kiosco Compass " << i + 1 << ": " << tiempoTotalCompass[i] << " segundos\n";
+    }
+    for (int i = 0; i < 3; i++) {
+        cout << "Tiempo del kiosco Efectivo " << i + 1 << ": " << tiempoTotalEfectivo[i] << " segundos\n";
+    }
+    cout << "\nTiempo total de la estacion: " << number << " segundos\n\n";
+}
