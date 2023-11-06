@@ -111,3 +111,22 @@ void estadisticas(double number, vector<double>& tiempoTotalCompass, vector<doub
     }
     cout << "\nTiempo total de la estacion: " << number << " segundos\n\n";
 }
+
+void* compass(void* args) {
+    ThreadArgs* arguments = (ThreadArgs*) args;
+    int number = arguments->autosPorKiosco + arguments->autosExtra;
+    for (int i = 0; i < number; i++) {
+        auto start_time = chrono::steady_clock::now();
+        sleep(3);
+        mtx.lock();
+        cout << "\n\tEl auto esta usando Compass.";
+        cout << "\n\tGracias por usar Compass, tenga buen viaje\n";
+        mtx.unlock();
+        auto end_time = chrono::steady_clock::now();
+        auto duration = chrono::duration_cast<chrono::seconds>(end_time - start_time).count();
+        (*arguments->tiempoTotal)[arguments->thread_id] += duration;
+    }
+    return NULL;-
+}
+
+
